@@ -29,14 +29,12 @@ def commits():
 
 args = parse_arguments()
 
-out = filter(
-    lambda x: args.scope is None or x["scope"] == args.scope,
-    filter(lambda x: args.type is None or x["type"] == args.type, commits()),
-)
+match_scope = lambda x: args.scope is None or x["scope"] == args.scope
+match_type = lambda x: args.type is None or x["type"] == args.type
 
-for i in list(out):
+for commit in list(filter(match_scope, filter(match_type, commits()))):
 
     if args.json:
-        print(json.dumps(i))
+        print(json.dumps(commit))
     else:
-        print(i["commit"])
+        print(commit["commit"])
