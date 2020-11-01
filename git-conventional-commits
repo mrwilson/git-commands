@@ -3,14 +3,16 @@
 import subprocess
 import argparse
 import re
+import json
 
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Log and filter conventional commit messages"
     )
-    parser.add_argument("--type", metavar="type", type=str, help="Type of commit")
-    parser.add_argument("--scope", metavar="type", type=str, help="Scope of commit")
+    parser.add_argument("--type", type=str, help="Type of commit")
+    parser.add_argument("--scope", type=str, help="Scope of commit")
+    parser.add_argument("--json", action="store_true", help="Format output as JSON")
     return parser.parse_args()
 
 
@@ -23,6 +25,7 @@ def commits():
         if groups is not None:
             yield groups.groupdict()
 
+
 args = parse_arguments()
 
 out = filter(
@@ -31,4 +34,8 @@ out = filter(
 )
 
 for i in list(out):
-    print(i["commit"])
+
+    if args.json:
+        print(json.dumps(i))
+    else:
+        print(i["commit"])
