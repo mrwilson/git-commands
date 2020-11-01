@@ -5,6 +5,8 @@ import argparse
 import re
 import json
 
+COMMIT_REGEX = '"(?P<commit>(?P<hash>[0-9a-fA-F]+) (?P<type>\w+)(\((?P<scope>.*)\))?:\s?(?P<message>.*))"'
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
@@ -17,12 +19,12 @@ def parse_arguments():
 
 
 def commits():
-    p = subprocess.check_output(["git", "log", '--pretty=format:"%h %s"']).splitlines()
-    for line in [l.decode("utf-8") for l in p]:
-        groups = re.match(
-            '"(?P<commit>(?P<hash>[0-9a-fA-F]+) (?P<type>\w+)(\((?P<scope>.*)\))?:\s?(?P<message>.*))"',
-            line,
-        )
+    output = subprocess.check_output(
+        ["git", "log", '--pretty=format:"%h %s"']
+    ).splitlines()
+
+    for line in output:
+        groups = re.match(COMMIT_REGEX, line.decode("utf-8"))
         if groups is not None:
             yield groups.groupdict()
 
