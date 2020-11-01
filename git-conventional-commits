@@ -20,7 +20,8 @@ def commits():
     p = subprocess.check_output(["git", "log", '--pretty=format:"%h %s"']).splitlines()
     for line in [l.decode("utf-8") for l in p]:
         groups = re.match(
-            '"(?P<commit>[0-9a-fA-F]+ (?P<type>\w+)(\((?P<scope>.*)\))?:\s?(?P<message>.*))"', line
+            '"(?P<commit>(?P<hash>[0-9a-fA-F]+) (?P<type>\w+)(\((?P<scope>.*)\))?:\s?(?P<message>.*))"',
+            line,
         )
         if groups is not None:
             yield groups.groupdict()
