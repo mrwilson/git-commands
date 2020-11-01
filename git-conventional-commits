@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+
+import subprocess
+import argparse
+import re
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        description="Log and filter conventional commit messages"
+    )
+    parser.add_argument("--type", metavar="type", type=str, help="Type of commit")
+    parser.add_argument("--scope", metavar="type", type=str, help="Scope of commit")
+    return parser.parse_args()
+
+
+def commits():
+    p = subprocess.check_output(["git", "log", '--pretty=format:"%h %s"']).splitlines()
+    for line in [l.decode("utf-8") for l in p]:
+        groups = re.match(
+            '"(?P<commit>[0-9a-fA-F]+ (?P<type>\w+)(\((?P<scope>.*)\))?:\s?(?P<message>.*))"', line
+        )
+        if groups is not None:
+            yield groups.groupdict()
+
+args = parse_arguments()
+
+out = filter(
+    lambda x: args.scope is None or x["scope"] == args.scope,
+    filter(lambda x: args.type is None or x["type"] == args.type, commits()),
+)
+
+for i in list(out):
+    print(i["commit"])
