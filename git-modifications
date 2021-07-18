@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+
+import subprocess
+from os import getcwd
+from os.path import basename
+from sys import argv
+
+COMMAND = [
+    "git",
+    "log",
+    "--numstat",
+    "--pretty=format:%s,%%h" % basename(getcwd()),
+] + argv[1:]
+
+output = subprocess.check_output(COMMAND).splitlines()
+
+current_commit = None
+
+for line in [output_line.decode("utf-8") for output_line in output]:
+
+    fields = line.split()
+
+    if len(fields) == 1:
+        # Store the hash of the commit with the
+        # individual file changes below
+        current_commit = line
+
+    if len(fields) == 3:
+        # Output <repo>,<hash>,<additions>,<deletions>,<filename>
+        print(",".join([current_commit] + fields))
