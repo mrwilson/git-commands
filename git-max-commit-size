@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+
+import subprocess
+from sys import argv
+
+
+class FileChange:
+    def __init__(self, filename, changes):
+        self.changes = changes
+        self.filename = filename
+
+
+def diff():
+    return subprocess.check_output(
+        ["git", "diff-index", "--cached", "HEAD"]
+    ).splitlines()
+
+
+def commit_size(commit_hash):
+    if commit_hash == "0" * 40:
+        # "Empty" hash to signal deletions (destination) or additions (source)
+        return 0
+    else:
+        return int(subprocess.check_output(["git", "cat-file", "-s", commit_hash]))
+
+
+def file_stat(line):
+    fields = line.decode("utf-8").split()
+
+    before_commit = fields[2]
+    after_commit = fields[3]
+    filename = fields[5]
+
+    return FileChange(filename, commit_size(after_commit) - commit_size(before_commit))
+
+
+def check_total_commit_size(stats):
+    total_size = sum(map(lambda result: abs(result.changes), stats))
+
+    if total_size > MAX_COMMIT_SIZE:
+        print("Total commit size (%d) exceeds +/-%d" % (total_size, MAX_COMMIT_SIZE))
+        exit(1)
+
+
+def check_oversized_commits(stats):
+    change_exceeds_size = lambda result: abs(result.changes) > MAX_COMMIT_SIZE
+
+    oversized_commits = filter(change_exceeds_size, stats)
+
+    if oversized_commits:
+        print("Single files exceed +/-%d:" % MAX_COMMIT_SIZE)
+        for file in oversized_commits:
+            print("\t%s (%d)" % (file.filename, file.changes))
+        exit(1)
+
+
+MAX_COMMIT_SIZE = int(argv[1]) if len(argv) >= 2 else 280
+
+per_file_stats = [file_stat(line) for line in diff()]
+
+check_oversized_commits(per_file_stats)
+check_total_commit_size(per_file_stats)
