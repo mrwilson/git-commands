@@ -2,6 +2,9 @@
 
 Some custom git commands to make life a bit easier.
 
+- [`git conventional-commits`](#git-conventional-commits)
+- [`git modifications`](#git-modifications)
+
 ## git-conventional-commits
 
 Filter structured git history that uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
@@ -30,4 +33,35 @@ $ git conventional-commits --type feat --json \
 3,for_id
 3,eu-parl
 2,no-pandas
+```
+
+## git-modifications
+
+Export a detailed history of file modifications in CSV format from a git repo.
+
+The columns are:
+ - Repository (current directory)
+ - Commit short hash
+ - Additions
+ - Deletions
+ - Filename
+
+```
+$ git modifications 
+
+git-commands,514889b,30,0,git-modifications
+git-commands,87ccc04,8,6,git-conventional-commits
+git-commands,f1ba0b2,5,7,git-conventional-commits
+git-commands,a8b5c93,33,0,README.md
+git-commands,0ff569c,2,1,git-conventional-commits
+git-commands,965c839,10,3,git-conventional-commits
+git-commands,c4bb513,34,0,git-conventional-commits
+```
+
+Command takes any flags that are accepted by `git log`
+
+```
+$ git modifications HEAD..HEAD~1
+
+git-commands,514889b,30,0,git-modifications
 ```
