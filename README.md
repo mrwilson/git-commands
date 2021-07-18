@@ -4,6 +4,7 @@ Some custom git commands to make life a bit easier.
 
 - [`git conventional-commits`](#git-conventional-commits)
 - [`git modifications`](#git-modifications)
+- [`git max-commit-size`](#git-max-commit-size)
 
 ## git-conventional-commits
 
@@ -64,4 +65,23 @@ Command takes any flags that are accepted by `git log`
 $ git modifications HEAD..HEAD~1
 
 git-commands,514889b,30,0,git-modifications
+```
+
+# git-max-commit-size
+
+Enforce a maximum size of commit (total changes and per-file changes), useful as a pre-commit hook.
+
+```
+$ git max-commit-size
+
+Single files exceed +/-280:
+        README.md (281)
+```
+
+It takes one numeric argument which is the upper bound on commit size (in characters).
+
+```
+$ git max-commit-size 1000
+$ echo $?
+0
 ```
