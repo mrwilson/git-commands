@@ -69,16 +69,16 @@ git-commands,514889b,30,0,git-modifications
 
 # git-max-commit-size
 
-Enforce a maximum size of commit (total changes and per-file changes), useful as a pre-commit hook.
+Enforce a maximum size of commit in characters useful as a pre-commit hook.
 
 ```
 $ git max-commit-size
-
-Single files exceed +/-280:
-        README.md (281)
+Total commit size (761) exceeds +280 characters
+$ echo $?
+1
 ```
 
-It takes one numeric argument which is the upper bound on commit size (in characters).
+It takes one numeric argument which is the upper bound on commit size.
 
 ```
 $ git max-commit-size 1000
